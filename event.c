@@ -8,7 +8,7 @@ struct ev_loop *Loop;
 /**
  * The yearly calender
  */
-EVENT *Calender[12][31];
+EVENT_TIMER *Calender[12][31];
 
 /**
  * For keyboard input watcher
@@ -92,7 +92,7 @@ void Initial_calender(void){
 /**
  * This function can add node to list
  */
-void add_list(EVENT *new_event, EVENT **head){
+void add_list(EVENT_TIMER *new_event, EVENT_TIMER **head){
 	if(new_event == NULL){
 		return;
 	}
@@ -114,14 +114,14 @@ void add_event(TM date, char *name){
 		new_event_timer->event_node = (EVENT *)malloc(sizeof(EVENT));
 		snprintf(new_event_timer->event_node->event_name, sizeof(new_event_timer->event_node->event_name), "%s", name);
 		TM_to_std_tm(date, &(new_event_timer->event_node->event_date));
-		new_event_timer->event_node->next = NULL;	
+		new_event_timer->next = NULL;	
 
 		/*Set up libev timer*/
 		//printf("delta = %f\n", (ev_tstamp)date_to_seconds(date) - now_time);
 		ev_timer_init(&new_event_timer->timer, timeout_callback, (ev_tstamp)date_to_seconds(date) - now_time, 0);
 		ev_timer_start(Loop, &new_event_timer->timer);
 
-		add_list(new_event_timer->event_node, &(Calender[date.tm_mon - 1][date.tm_mday -1]));
+		add_list(new_event_timer, &(Calender[date.tm_mon - 1][date.tm_mday -1]));
 	}
 }
 /**
@@ -132,11 +132,11 @@ void print_calender(void){
 	int day_counter;
 	for(month_counter = 0; month_counter < 12; month_counter++){
 		for(day_counter = 0; day_counter < 31; day_counter++){
-			EVENT *tmp;
+			EVENT_TIMER *tmp = NULL;
 			for(tmp = Calender[month_counter][day_counter]; tmp != NULL; tmp = tmp->next){
 				printf("-----------------------Event-----------------------\n");
-				printf("Event name = %s\n", tmp->event_name);
-				printf("Evnet alert time : %s", asctime(&(tmp->event_date)));
+				printf("Event name = %s\n", tmp->event_node->event_name);
+				printf("Evnet alert time : %s", asctime(&(tmp->event_node->event_date)));
 				printf("-----------------------Event-----------------------\n\n");
 			}
 		}

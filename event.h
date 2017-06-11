@@ -22,7 +22,6 @@ extern struct ev_loop *Loop;
 typedef struct _node{
 	char event_name[event_name_len];
 	struct tm event_date;
-	struct _node *next;
 }EVENT;
 
 /**
@@ -31,12 +30,13 @@ typedef struct _node{
 typedef struct _custom_timer{
 	ev_timer timer;
 	EVENT *event_node;
+	struct _custom_timer *next;
 }EVENT_TIMER;
 
 /**
  * The yearly calender
  */
-extern EVENT *Calender[12][31];
+extern EVENT_TIMER *Calender[12][31];
 
 /**
  * For keyboard input watcher
@@ -56,7 +56,7 @@ void Initial_calender(void);
 /**
  * This function can add node to list
  */
-void add_list(EVENT *new_event, EVENT **head);
+void add_list(EVENT_TIMER *new_event, EVENT_TIMER **head);
 
 /**
  * This function can add a new event to calender
